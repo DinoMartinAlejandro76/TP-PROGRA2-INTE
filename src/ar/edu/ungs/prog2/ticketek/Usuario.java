@@ -12,13 +12,12 @@ public class Usuario {
 
 
     //Constructor
-    public Usuario(String email, String nombre, String apellido, String contrasenia, List<Entrada> entradas) {
+    public Usuario(String email, String nombre, String apellido, String contrasenia) {
 
         this.email = email;
         this.nombre = nombre;
         this.apellido = apellido;
         this.contrasenia = contrasenia;
-        this.entradas = entradas;
 
     }
 
@@ -38,8 +37,9 @@ public class Usuario {
     //Agregar entrada
     public void agregarEntrada(Entrada entrada) {
 
-        //Algo asi? Alguna validacion??
-
+        if (entrada == null) {
+            throw new RuntimeException("Entrada no puede ser nula");
+        }
         entradas.add(entrada);
 
     }
