@@ -9,6 +9,10 @@ public class Ticketek implements ITicketek {
 
     //Para las sedes
     private Map<String, Sede> sedes = new HashMap<>();
+    //Para los usuarios
+    private Map<String, Usuario> usuarios = new HashMap<>();
+    //Entradas
+    private Map<String, IEntrada> entradas = new HashMap<>();
 
     @Override
     public void registrarSede(String nombre, String direccion, int capacidadMaxima) {
@@ -41,6 +45,17 @@ public class Ticketek implements ITicketek {
 
     @Override
     public void registrarUsuario(String email, String nombre, String apellido, String contrasenia) {
+
+        if (email == null || email.isEmpty() || nombre == null || nombre.isEmpty() || apellido == null || apellido.isEmpty() || contrasenia == null || contrasenia.isEmpty()) {
+            throw new RuntimeException("Los datos del usuario no son válidos");
+        }
+        if (usuarios.containsKey(email)) {
+            throw new RuntimeException("Ya existe un usuario con ese email");
+        }
+        Usuario nuevoUsuario = new Usuario(email, nombre, apellido, contrasenia);
+        usuarios.put(email, nuevoUsuario);
+
+
 
     }
 
