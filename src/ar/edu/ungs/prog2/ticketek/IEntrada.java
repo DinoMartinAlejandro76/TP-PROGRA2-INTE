@@ -37,4 +37,5 @@ public interface IEntrada {
     String toString();
 
 
+
 }

@@ -1,5 +1,6 @@
 package ar.edu.ungs.prog2.ticketek;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -13,11 +14,13 @@ public class Ticketek implements ITicketek {
     private Map<String, Usuario> usuarios = new HashMap<>();
     //Entradas
     private Map<String, IEntrada> entradas = new HashMap<>();
+    //Espectaculos
+    private Map<String, Espectaculo> espectaculos = new HashMap<>();
 
     @Override
     public void registrarSede(String nombre, String direccion, int capacidadMaxima) {
 
-        if(sedes.containsKey(nombre)) {
+        if (sedes.containsKey(nombre)) {
             throw new RuntimeException("Ya existe una sede con ese nombre");
         }
         Sede nuevaSede = new Estadio(nombre, direccion, capacidadMaxima);
@@ -56,27 +59,88 @@ public class Ticketek implements ITicketek {
         usuarios.put(email, nuevoUsuario);
 
 
-
     }
 
     @Override
     public void registrarEspectaculo(String nombre) {
+
+        if (nombre == null || nombre.isEmpty()) {
+            throw new RuntimeException("El nombre del espectáculo no es válido");
+        }
+        if (espectaculos.containsKey(nombre)) {
+            throw new RuntimeException("Ya existe un espectáculo con ese nombre");
+        }
+        Espectaculo nuevoEspectaculo = new Espectaculo(nombre);
+        espectaculos.put(nombre, nuevoEspectaculo);
+
 
     }
 
     @Override
     public void agregarFuncion(String nombreEspectaculo, String fecha, String sede, double precioBase) {
 
+        if (!espectaculos.containsKey(nombreEspectaculo)) {
+            throw new RuntimeException("El espectáculo no existe.");
+        }
+
+        if (!sedes.containsKey(sede)) {
+            throw new RuntimeException("La sede no existe.");
+        }
+
+        Espectaculo espectaculo = espectaculos.get(nombreEspectaculo);
+        Sede sedeEncontrada = sedes.get(sede);
+
+        Funcion nuevaFuncion = new Funcion(espectaculo, fecha, sede, precioBase);
+        sedeEncontrada.agregarFuncion(nuevaFuncion);
+
+
     }
 
     @Override
     public List<IEntrada> venderEntrada(String nombreEspectaculo, String fecha, String email, String contrasenia, int cantidadEntradas) {
+
+        //Se debe lanzar una excepcion si: - Si la sede de la funcion está numerada -
+        //        si el usuario no está registrado - si el espectaculo no está registrado -
+        //        si la contraseña no es valida -
+
+        if (!espectaculos.containsKey(nombreEspectaculo)) {
+            throw new RuntimeException("El espectáculo no existe.");
+        }
+        if (!usuarios.containsKey(email)) {
+            throw new RuntimeException("El usuario no existe.");
+        }
+
+        if (!usuarios.get(email).validarContrasenia(contrasenia)) {
+            throw new RuntimeException("La contraseña es inválida.");
+        }
+
+
         return List.of();
+
     }
+
 
     @Override
     public List<IEntrada> venderEntrada(String nombreEspectaculo, String fecha, String email, String contrasenia, String sector, int[] asientos) {
-        return List.of();
+
+
+        if (!espectaculos.containsKey(nombreEspectaculo)) {
+            throw new RuntimeException("El espectáculo no existe.");
+        }
+        if (!usuarios.containsKey(email)) {
+            throw new RuntimeException("El usuario no existe.");
+        }
+
+        if (!usuarios.get(email).validarContrasenia(contrasenia)) {
+            throw new RuntimeException("La contraseña es inválida.");
+        }
+        //Si no devolver la lista de entradas vendidas
+        List<IEntrada> entradasVendidas = new ArrayList<>();
+        for (int i = 0; i < asientos.length; i++) {
+            Entrada entrada = new Entrada(email, nombreEspectaculo, fecha, sector, asientos[i]);
+            entradasVendidas.add(entrada);
+        }
+        return entradasVendidas;
     }
 
     @Override
@@ -96,11 +160,36 @@ public class Ticketek implements ITicketek {
 
     @Override
     public List<IEntrada> listarTodasLasEntradasDelUsuario(String email, String contrasenia) {
-        return List.of();
+
+        if (!usuarios.containsKey(email)) {
+            throw new RuntimeException("El usuario no existe.");
+        }
+        if (!usuarios.get(email).validarContrasenia(contrasenia)) {
+            throw new RuntimeException("La contraseña es inválida.");
+        }
+
+        //Recorro el ArrayLista de entradas de usuario
+        ArrayList<Entrada> entradasUsuario = usuarios.get(email).getEntradas();
+
+        //Creo una lista de entradas
+        List<IEntrada> entradas = new ArrayList<>();
+        //Recorro la lista de entradas del usuario
+
+        for (Entrada entrada : entradasUsuario) {
+
+            entradas.add(entrada);
+
+        }
+
+
+
+
+        return entradas;
     }
 
     @Override
     public boolean anularEntrada(IEntrada entrada, String contrasenia) {
+
         return false;
     }
 
@@ -116,7 +205,38 @@ public class Ticketek implements ITicketek {
 
     @Override
     public double costoEntrada(String nombreEspectaculo, String fecha) {
-        return 0;
+        if (!espectaculos.containsKey(nombreEspectaculo)) {
+            throw new RuntimeException("El espectáculo no existe.");
+        }
+        if (!sedes.containsKey(fecha)) {
+            throw new RuntimeException("La sede no existe.");
+        }
+
+        Espectaculo espectaculo = espectaculos.get(nombreEspectaculo);
+        Funcion funcionEncontrada = null;
+        for (Funcion f : espectaculo.getFunciones()) {
+            if (f.getLocalDate().equals(fecha)) {
+                funcionEncontrada = f;
+                break;
+            }
+        }
+        if (funcionEncontrada == null) {
+            throw new RuntimeException(
+                    "No existe función para ese espectáculo en la fecha indicada."
+            );
+        }
+
+
+        Sede sedeDeFuncion = funcionEncontrada.getSede();
+        if (!(sedeDeFuncion instanceof Estadio)) {
+            throw new RuntimeException(
+                    "La sede de esta función está numerada; este método es sólo para estadios."
+            );
+        }
+
+
+        return funcionEncontrada.getPrecioBase();
+
     }
 
     @Override
@@ -126,7 +246,16 @@ public class Ticketek implements ITicketek {
 
     @Override
     public double totalRecaudado(String nombreEspectaculo) {
-        return 0;
+
+        if (!espectaculos.containsKey(nombreEspectaculo)) {
+            throw new RuntimeException("El espectáculo no existe.");
+        }
+        Espectaculo espectaculo = espectaculos.get(nombreEspectaculo);
+        double totalRecaudado = 0;
+        for (Funcion funcion : espectaculo.getFunciones()) {
+            totalRecaudado += funcion.calcularTotalRecaudado();
+        }
+        return totalRecaudado;
     }
 
     @Override

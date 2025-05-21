@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class Teatro extends Sede {
 
-    private int asientosPorFila;
-    private String[] sectores;
+    int asientosPorFila;
+    public String[] sectores;
     private int[] capacidad;
     private int[] porcentajeAdicional;
 
