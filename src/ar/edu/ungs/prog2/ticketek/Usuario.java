@@ -1,5 +1,6 @@
 package ar.edu.ungs.prog2.ticketek;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Usuario {
@@ -8,7 +9,7 @@ public class Usuario {
     private String nombre;
     private String apellido;
     private String contrasenia;
-    private List<Entrada> entradas;
+    private ArrayList<Entrada> entradas;
 
 
     //Constructor
@@ -21,10 +22,21 @@ public class Usuario {
 
     }
 
+    //Otro constructor que toma la lista de entradas
+    public Usuario(String email, String nombre, String apellido, String contrasenia, ArrayList<Entrada> entradas) {
+
+        this.email = email;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.contrasenia = contrasenia;
+        this.entradas = entradas;
+
+    }
+
     //Metodos
 
     //Validar Contraseña
-    public boolean validarContraseña(String contrasenia) {
+    public boolean validarContrasenia(String contrasenia) {
 
         //Validar que sea la contraseña igual a la del usuario. Podria ser que este algo asi?
 
@@ -45,7 +57,7 @@ public class Usuario {
     }
 
     //Obtener la lista de entradas del usuario. //Generada con getter
-    public List<Entrada> getEntradas() {
+    public ArrayList<Entrada> getEntradas() {
         return entradas;
     }
 
@@ -63,6 +75,13 @@ public class Usuario {
 
 
     }
+
+    //Getters y Setters
+
+    public String getContrasenia() {
+        return contrasenia;
+    }
+
 
 
 

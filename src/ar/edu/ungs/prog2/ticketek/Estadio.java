@@ -11,6 +11,9 @@ public class Estadio extends Sede {
         // TODO Auto-generated constructor stub
     }
 
+
+    //Metodo
+    @Override
     public double calcularPrecioEntrada(double precioBase, int sector) {
         // En un estadio no importa el sector:
         return precioBase;

@@ -3,7 +3,7 @@ package ar.edu.ungs.prog2.ticketek;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class Entrada {
+public class Entrada implements IEntrada{
 
     private int codigoEntrada;
     private Espectaculo espectaculo;
@@ -11,7 +11,7 @@ public class Entrada {
     private Usuario comprador;
     private int sector;
     private int asiento;
-
+    private String nombreSector;
 
 
     //contructor
@@ -26,6 +26,10 @@ public class Entrada {
         this.asiento = asiento;
     }
 
+    //Contructor para entradas vendidas
+    public Entrada(String email, String nombreEspectaculo, String fecha, String sector, int asiento) {
+
+    }
 
 
     //Metodos
@@ -126,11 +130,33 @@ public class Entrada {
     }
 
 
+    @Override
+    public double precio() {
+
+        return funcion.calcularPrecio();
+    }
+
+    @Override
+    public String ubicacion() {
+        Sede sede = funcion.getSede();
+        if(sede instanceof Estadio){
+            return "Campo";
+        }
+
+        Teatro teatro = (Teatro) sede;
+        String[] listaSectores = teatro.sectores;
+        int asientosPorFila = teatro.asientosPorFila;
+        String nombreSetor = listaSectores[sector];
+
+        int fila  = (asiento / asientosPorFila) + 1;
+        int nroAsiento = (asiento % asientosPorFila) + 1;
+
+        return nombreSector + " f:" + fila + " a:" + nroAsiento;
 
 
 
 
-
+    }
 
 
 }
